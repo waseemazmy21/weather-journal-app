@@ -1,8 +1,8 @@
 /* Global Variables */
 
-let baseURL = 'http://api.openweathermap.org/data/2.5/weather?zip=';
-let apiKey = '2a709527ce5daa8c2ca32ecb168d8403';
-let button = document.getElementById('generate')
+const baseURL = 'http://api.openweathermap.org/data/2.5/weather?zip=';
+const apiKey = '2a709527ce5daa8c2ca32ecb168d8403';
+const button = document.getElementById('generate')
 // Create a new date instance dynamically with JS
 let d = new Date();
 let newDate = d.getMonth()+'.'+ d.getDate()+'.'+ d.getFullYear();
@@ -10,20 +10,15 @@ let newDate = d.getMonth()+'.'+ d.getDate()+'.'+ d.getFullYear();
 // async get function 
 
 const getData = async (baseURL,zip,apiKey)=>{
-    const res = await fetch(baseURL + zip + '&units=metric&appid=' + apiKey)
-  
-    try{
-  
-      const data = await res.json();
-      return data['main']['temp']
-      
-  
-    }catch(error){
-  
-      console.log('error',error)
-  
-    }
-}
+  const res = await fetch(baseURL + zip + '&units=metric&appid=' + apiKey)
+  try{
+  const data = await res.json();
+  return data;
+  }catch(error){
+  console.log('error',error)
+  }
+  }
+
 
 const getProjectData = async (url = '')=>{
        const res = await fetch('/getProjectData')
@@ -31,8 +26,7 @@ const getProjectData = async (url = '')=>{
     try{
   
       const data = await res.json();
-      console.log(data);
-      
+      return data
   
     }catch(error){
   
@@ -65,16 +59,16 @@ const postData = async ( url = '', data = {})=>{
 
 //update function
 const updateUI = async () => {
-    const request = await fetch('/getProjectData');
-    try{
-      const projectData = await request.json();
-      document.getElementById('date').innerHTML = projectData[0].temperature;
-      document.getElementById('temp').innerHTML = projectData[0].date;
-      document.getElementById('content').innerHTML = projectData[0]['user response'];
+  const request = await fetch('/getProjectData');
+  try{
+  const projectData = await request.json();
+  document.getElementById('date').innerHTML = projectData.temperature;
+  document.getElementById('temp').innerHTML = projectData.date;
+  document.getElementById('content').innerHTML = projectData.userResponse;
   
-    }catch(error){
-      console.log("error", error);
-    }
+  }catch(error){
+    console.log("error", error);
+  }
   }
 
 button.addEventListener('click',action);
@@ -86,9 +80,11 @@ function action(){
 
     getData(baseURL,zipCode,apiKey)
     .then((data)=>{
-        postData('/postData',{temperature: data,date: d,'user response': userRes})
-    })
-    .then(updateUI())
+      postData('/postData',{temperature: data.main.temp,date: newDate,userResponse: userRes})
+      })
+      .then(function(){
+      updateUI()
+      })
 
     
 }
